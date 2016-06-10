@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <h2></h2>
+</head>
+<body>
+{{#current-page-list}}
+<a href="/movie?id={{id}}">{{first_name}} {{last_name}}</a>
+<br>
+{{/current-page-list}}
+
+{{^firstpage}}
+<form action="/select-page" method="post" style="display: inline-block;">
+    <input type="hidden" name="pageselected" value="previous">
+    <button type="submit">Prev</button>
+</form>
+{{/firstpage}}
+{{^lastpage}}
+<form action="/select-page" method="post" style="display: inline-block;">
+    <input type="hidden" name="pageselected" value="next">
+    <button type="submit">Next</button>
+</form>
+{{/lastpage}}<br>
+Page {{pagenumber}} of {{totalpages}}
+<form action="select-page" method="post">
+    Jump to page <input type="number" name="pageselected" placeholder="1" style="width:20px"/>
+    <button type="submit">Go</button>
+</form>
+
+<div name="add-movie-ui">
+
+
+</div>
+</body>
+</html>
