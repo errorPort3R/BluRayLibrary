@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="UTF-8">
     <title>Movie Details</title>
 </head>
 <body>
 <h2>{{title}}</h2>
-Starring:{{actors#}}{{.}}<br>{{/actors}}
-Directed By:{{director}}<br>
-Runtime:{{runtime}}<br>
-Released:{{year}}<br>
-Rating:{{rating}}/5
+<b>Starring:</b><br>{{#actors}}{{.}}<br>{{/actors}}
+<br><b>Directed By:</b>{{director}}<br>
+<b>Runtime:</b>{{runtime}} minutes<br>
+<b>Released:</b>{{year}}<br>
+<b>Rating:</b>{{rating}}/5
 
-{{^show-edit-form}}
+
 <form action="/toggle-edit" method="post">
     <div class="mid-field-buttons">
+        {{^show-edit-form}}
         <button type="submit">Edit Movie</button>
+        {{/show-edit-form}}
     </div>
 </form>
-{{/show-edit-form}}
+
 
 <div class="addmovieui">
     {{#show-edit-form}}
-    <form action="/add-movie" method="post">
+    <form action="/edit-movie" method="post">
         <input type="text" name="title" value="{{title}}" style="width:400px;"><br><br>
-        <textarea name="actors" default="{{actors#}}{{.}}<br>{{/actors}}" style="width:400px; height:80px;"></textarea><br><br>
+        <textarea name="actors" value="{{#actors}}{{.}}<br>{{/actors}}" style="width:400px; height:80px;"></textarea><br><br>
         <input type="text" name="director" value="{{director}}" style="width:400px;"><br>
         Runtime<input type="number" name="runtime" value="{{runtime}}" style="width:40px;"> minutes<br>
         Year released<input type="number" name="year" value="{{year}}" style="width:75px;"><br>
@@ -35,6 +38,7 @@ Rating:{{rating}}/5
         <input type="radio" name="rating" value="4">
         <input type="radio" name="rating" value="5"> <br>
         &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
+        <input type="hidden" name="id" value="{{id}}">
         <button type="submit">Update</button>
     </form>
     {{/show-edit-form}}

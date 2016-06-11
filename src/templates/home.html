@@ -8,10 +8,10 @@
 </head>
 <body>
 {{^signed-in}}
-<form action="/login" method="post" style="display: inline-block;">
+<form action="/login" method="post">
     <input type="text" name="username" placeholder="Username"/>
-    <input type="text" name="password" placeholder="Password"/>
-    <button type="submit" style="display: inline-block;">Login</button>
+    <input type="text" name="password" placeholder="Password"/><br>
+    <button type="submit">Login</button><br>
 </form>
 {{/signed-in}}
 {{#signed-in}}
@@ -20,8 +20,15 @@ Welcome {{current-user}}<br>
     <button type="submit">Logout</button>
 </form>
 {{/signed-in}}
+<br>
 {{#current-page-list}}
-<a href="/movie?id={{id}}">{{title}}</a>
+<a href="/movie?id={{id}}">{{title}}</a>&nbsp{{year}}
+{{#canDelete}}
+<form action="/delete" method="post"style="display: inline-block;">
+    <input type="hidden" value="{{id}}"  name="id">
+    <button type="submit">Delete</button>
+</form>
+{{/canDelete}}
 <br>
 {{/current-page-list}}
 
@@ -31,12 +38,14 @@ Welcome {{current-user}}<br>
     <button type="submit">Prev</button>
 </form>
 {{/firstpage}}
+
 {{^lastpage}}
 <form action="/select-page" method="post" style="display: inline-block;">
     <input type="hidden" name="pageselected" value="next">
     <button type="submit">Next</button>
 </form>
 {{/lastpage}}<br>
+
 Page {{pagenumber}} of {{totalpages}}
 <form action="select-page" method="post">
     Jump to page <input type="number" name="pageselected" placeholder="1" style="width:20px;"/>
@@ -44,7 +53,11 @@ Page {{pagenumber}} of {{totalpages}}
 </form>
  <form action="/toggle-add" method="post">
      <div class="mid-field-buttons">
+         {{^show-movie-form}}
+         {{#signed-in}}
         <button type="submit">Add Movie</button>
+         {{/signed-in}}
+         {{/show-movie-form}}
      </div>
  </form>
 
@@ -64,8 +77,9 @@ Page {{pagenumber}} of {{totalpages}}
         <input type="radio" name="rating" value="4">
         <input type="radio" name="rating" value="5"> <br>
         &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
-        <button type="submit">Add Movie</button>
-    </form>
+        <button type="submit">Add Movie</button></form>
+    <form action="/toggle-add" method="post" style="display: inline-block;">
+        <button type="submit">Cancel</button></form>
    {{/show-movie-form}}
 </div>
 </body>

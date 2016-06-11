@@ -7,9 +7,9 @@
 .mid-field-buttons
 {
     position: absolute;
-        left: 500;
-        top: 35%;
-        width: 35%;
+        left: 0;
+        top: 45%;
+        width: 100%;
         text-align: center;
 
 }

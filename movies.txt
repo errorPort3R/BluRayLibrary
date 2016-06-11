@@ -1,0 +1,4 @@
+4|2001|97|Sharon McGuire|Bridget Jones's Diary|Jeffry|Renee Zellweger|Colin Firth|Hugh Grant
+5|1991|100|Michael Lehmann|Hudson Hawk|Jeffry|Bruce Willis|Danny Aiello|Andie MacDowell|James Coburn
+5|2009|127|J. J. Abrams|Star Trek|Jeffry|Chris Pine|Zachary Quinto|Simon Pegg|Leonard Nimoy|Zoe Saldana|Karl Urban|Bruce Greenwood|Eric Bana|John Cho|Anton Yelchin
+5|2013|132|J. J. Abrams|Star Trek: Into Darkness|Jeffry|Chris Pine|Zachary Quinto|Zoe Saldana|Benedict Cumberbatch|Karl Urban|Simon Pegg|John Cho|Anton Yelchin|Bruce Greenwood

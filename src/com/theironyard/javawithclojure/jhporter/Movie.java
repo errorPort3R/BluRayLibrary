@@ -20,6 +20,7 @@ public class Movie implements Comparable
     String owner;
     int id;
     static int sessionUniqueId = 10110;
+    boolean canDelete;
 
     public Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating, String owner) {
         this.title = title;
