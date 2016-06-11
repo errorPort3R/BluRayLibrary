@@ -4,11 +4,24 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="UTF-8">
     <title>Home</title>
-    <h2></h2>
+    <h2>Movie Library</h2>
 </head>
 <body>
+{{^signed-in}}
+<form action="/login" method="post" style="display: inline-block;">
+    <input type="text" name="username" placeholder="Username"/>
+    <input type="text" name="password" placeholder="Password"/>
+    <button type="submit" style="display: inline-block;">Login</button>
+</form>
+{{/signed-in}}
+{{#signed-in}}
+Welcome {{current-user}}<br>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+{{/signed-in}}
 {{#current-page-list}}
-<a href="/movie?id={{id}}">{{first_name}} {{last_name}}</a>
+<a href="/movie?id={{id}}">{{title}}</a>
 <br>
 {{/current-page-list}}
 
@@ -26,13 +39,34 @@
 {{/lastpage}}<br>
 Page {{pagenumber}} of {{totalpages}}
 <form action="select-page" method="post">
-    Jump to page <input type="number" name="pageselected" placeholder="1" style="width:20px"/>
+    Jump to page <input type="number" name="pageselected" placeholder="1" style="width:20px;"/>
     <button type="submit">Go</button>
 </form>
+ <form action="/toggle-add" method="post">
+     <div class="mid-field-buttons">
+        <button type="submit">Add Movie</button>
+     </div>
+ </form>
 
-<div name="add-movie-ui">
 
-
+<div class="addmovieui">
+    {{#show-movie-form}}
+    <form action="/add-movie" method="post">
+    <input type="text" name="title" placeholder="Movie Title"style="width:400px;"><br><br>
+    <textarea name="actors" placeholder="Actors/Actresses(one name per line)" style="width:400px; height:80px;"></textarea><br><br>
+    <input type="text" name="director" placeholder="Director" style="width:400px;"><br>
+    Runtime<input type="number" name="runtime" placeholder="120" style="width:40px;"> minutes<br>
+    Year released<input type="number" name="year" placeholder="2000" style="width:75px;"><br>
+    Rating<br>
+        <input type="radio" name="rating" value="1" checked>
+        <input type="radio" name="rating" value="2">
+        <input type="radio" name="rating" value="3">
+        <input type="radio" name="rating" value="4">
+        <input type="radio" name="rating" value="5"> <br>
+        &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
+        <button type="submit">Add Movie</button>
+    </form>
+   {{/show-movie-form}}
 </div>
 </body>
 </html>

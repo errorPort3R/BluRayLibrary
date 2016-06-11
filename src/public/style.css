@@ -1,0 +1,15 @@
+.addmovieui
+{
+     position: absolute;
+     top: 120px;
+     right: 40px;
+}
+.mid-field-buttons
+{
+    position: absolute;
+        left: 500;
+        top: 35%;
+        width: 35%;
+        text-align: center;
+
+}

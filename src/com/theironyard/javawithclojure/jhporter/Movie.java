@@ -38,7 +38,23 @@ public class Movie implements Comparable
     public int compareTo(Object o)
     {
         Movie movie = (Movie) o;
-        return this.title.compareTo(movie.title);
+        int tryOne = this.title.compareTo(movie.title);
+        if (tryOne == 0)
+        {
+            if(this.releaseYear > movie.releaseYear)
+            {
+                tryOne=-1;
+            }
+            else if(this.releaseYear < movie.releaseYear)
+            {
+                tryOne = 1;
+            }
+            else
+            {
+                tryOne=0;
+            }
+        }
+        return tryOne;
     }
 }
 
