@@ -20,11 +20,11 @@ public class Main
     static ArrayList<Boolean> canDelete;
     static ArrayList<Movie> pageList;
     static int currentPage = 1;
-    static int totalPages= 1;
+    static int totalPages;
     static boolean firstpage = true;
-    static boolean lastpage = false;
+    static boolean lastpage;
     static boolean showAddForm=false;
-    static boolean showEditForm=false;
+    static boolean showEditForm = false;
     static boolean signedIn = false;
     static int editPageId;
 
@@ -45,8 +45,7 @@ public class Main
                 {
                     //get values for page
                     double numOfEntries = movieArchive.size();
-                    int totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
-                    canDelete =  new ArrayList<>();
+                    totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
                     Session session = request.session();
                     String username = session.attribute("username");
 
@@ -102,52 +101,14 @@ public class Main
                     h.put("lastpage", lastpage);
                     h.put("show-movie-form",showAddForm);//add method for this
                     h.put("signed-in", signedIn);//add method for this
-                    if (username!=null)  {h.put("current-user", username);}
+                    if (username!=null)
+                    {
+                        h.put("current-user", username);
+                    }
                     return new ModelAndView(h, "home.html");
                 },
                 new MustacheTemplateEngine()
         );
-        Spark.get(
-                "/movie",
-                (request, response) ->
-                {
-                    int identity;
-                    if (request.queryParams("show-edit") != null)
-                    {
-                        showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
-                    }
-                    if (request.queryParams("id") != null)
-                    {
-                        identity = Integer.valueOf(request.queryParams("id"));
-                        editPageId = identity;
-                    }
-                    else
-                    {
-                        identity = editPageId;
-                    }
-                    Movie movie = null;
-                    int spotInList = findMovie(identity);
-                    movie = movieArchive.get(spotInList);
-
-                    HashMap m = new HashMap();
-                    if (movie !=null)
-                    {
-                        m.put("title", movie.title);
-                        m.put("actors", movie.actors);
-                        m.put("director", movie.director);
-                        m.put("runtime", movie.minutesRuntime);
-                        m.put("rating", movie.rating);
-                        m.put("year", movie.releaseYear);
-                        m.put("id", movie.id);
-                        m.put("can-edit", movie.canDelete);
-                        m.put("show-edit-form",showEditForm);
-                    }
-                    return new ModelAndView(m, "movie.html");
-                },
-                new MustacheTemplateEngine()
-
-        );
-
         Spark.post(
                 "/next-page",
                 (request, response ) ->
@@ -194,22 +155,22 @@ public class Main
                     }
                     else
                     {
-                        lastpage= false;
+                        lastpage = false;
                     }
-
                     response.redirect("/");
                     return "";
                 }
         );
         Spark.post(
-                "/select-page",
+                "/selectpage",
                 (request, response ) ->
                 {
                     int chosenPage=currentPage;
                     String pageStr = request.queryParams("pageselected");
                     if (pageStr.isEmpty() || Integer.valueOf(pageStr)>totalPages ||Integer.valueOf(pageStr)<1)
                     {
-
+                        response.redirect("/");
+                        return"";
                     }
                     else
                     {
@@ -233,6 +194,7 @@ public class Main
                     {
                         lastpage= false;
                     }
+
                     response.redirect("/");
                     return "";
                 }
@@ -336,6 +298,46 @@ public class Main
                     return"";
                 }
         );
+        Spark.get(
+                "/movie",
+                (request, response) ->
+                {
+                    int identity;
+                    if (request.queryParams("show-edit") != null)
+                    {
+                        showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
+                    }
+                    if (request.queryParams("id") != null)
+                    {
+                        identity = Integer.valueOf(request.queryParams("id"));
+                        editPageId = identity;
+                    }
+                    else
+                    {
+                        identity = editPageId;
+                    }
+                    Movie movie = null;
+                    int spotInList = findMovie(identity);
+                    movie = movieArchive.get(spotInList);
+
+                    HashMap m = new HashMap();
+                    if (movie !=null)
+                    {
+                        m.put("title", movie.title);
+                        m.put("actors", movie.actors);
+                        m.put("director", movie.director);
+                        m.put("runtime", movie.minutesRuntime);
+                        m.put("rating", movie.rating);
+                        m.put("year", movie.releaseYear);
+                        m.put("id", movie.id);
+                        m.put("can-edit", movie.canDelete);
+                        m.put("show-edit-form",showEditForm);
+                    }
+                    return new ModelAndView(m, "movie.html");
+                },
+                new MustacheTemplateEngine()
+
+        );
         Spark.post(
                 "/edit-movie",
                 (request, response) ->
@@ -424,6 +426,7 @@ public class Main
                 {
                     Session session = request.session();
                     session.invalidate();
+
                     response.redirect("/");
                     return"";
                 }
