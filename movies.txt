@@ -1,4 +1,47 @@
+4|1999|97|Gil Junger|10 Things I Hate About You|Bob|Julia Stiles|Heath Ledger|Joseph Gordon-Levitt|Larissa Oleynik|Larry Miller|Andrew Keegan|David KrumHoltz|Susan May Pratt
+3|2008|111|Anne Fletcher|27 Dresses|Jeffry|Katherine Heigl|James Marsden|Malin Akerman|Judy Greer|Edward Burns
 4|2001|97|Sharon McGuire|Bridget Jones's Diary|Jeffry|Renee Zellweger|Colin Firth|Hugh Grant
-5|1991|100|Michael Lehmann|Hudson Hawk|Jeffry|Bruce Willis|Danny Aiello|Andie MacDowell|James Coburn
+4|2004|98|Shawn Levy|Cheaper by the Dozen|Jeffry|Steve Martin|Bonnie Hunt|Hillary Duff|Tom Welling|Piper Perabo
+3|2004|92|Rawson Marshall Thurber|DodgeBall|Alice|Vince Vaughn|Ben Stiller|Christine Taylor|Rip Torn
+3|2006|98|Florian Ballhaus|Flightplan|Jeffry|Jodie Foster
+3|2008|112|Andy Tennant|Fool's Gold|Alice|Matthew McConaughey|Kate Hudson|Donald Sutherland|Ewen Bremner|Alexis Oziena|Kevin Hart|Ray Winstone
+4|2003|97|Mark Waters|Freaky Friday|Jeffry|Jamie Lee Curtis|Lindsay Lohan|Chad Michael Murray|mark Harmon
+5|2007|121|Edgar Wright|Hot Fuzz|Jeffry|Simon Pegg|Nick Frost
+5|1991|100|Michael Lehmann|Hudson Hawk|Jeffry|Danny Aiello|Bruce Willis|Andie MacDowell|James Coburn
+5|2006|87|Mike Judge|Idiocracy|Bob|Luke Wilson|Maya Rudolph|Dax Shepard
+5|2008|125|Jon Favreau|Iron Man|Alice|Robert Downey Jr.|Terrence Howard|Jeff Bridges|Gwyneth Paltrow|Shaun Taub
+5|2001|91|Dennie Gordon|Joe Dirt|Jeffry|David Spade|Dennis Miller|Brittany Daniel|Christopher Walken
+3|2007|96|Jason Reitman|Juno|Jeffry|Ellen Page|Michael Cera|Jennifer Garner|Jason Bateman|Allison Janney|J.K. Simmons
+4|2007|129|Len Wiseman|Live Free or Die Hard|Alice|Bruce Willis|Justin Long|Timothy Olyphant|Cliff Curtis|Maggie Q
+3|2003|138|Lana and Lilly Wachowski|Matrix: Reloaded|Jeffry|Keanu Reeves|Laurence Fishburne|Carrie-Anne Moss|Hugo Weaving
+3|2005|116|Jay Roach|Meet the Fockers|Jeffry|Ben Stiller|Robert DeNiro|Dustin Hoffman|Barbra Streisand
+2|2007|95|Stephen J. Anderson|Meet the Robinsons|Alice|Daniel Hanson|Wesley Singerman|Angela Bassett|Jordan Fry
+5|2001|92|Pete Doctor, David Silverman, Lee Unkrich|Monsters, Inc.|Bob|Billy Crystal|John Goodman|Mary Gibbs|Steve Buscemi|James Coburn
+4|2007|103|Doug Liman|Mr. & Mrs. Smith|Jeffry|Brad Pitt|Angelina Jolie
+5|1992|120|Johnathan Lynn|My Cousin Vinnie|Jeffry|Joe Pesci|Ralph Macchio|Marissa Tomei|Fred Gwynne
+4|2004|95|Jared Hess|Napolean Dynamite|Alice|Jon Heder|Jon Gries|Aaron Ruell|Efren Ramirez|Tina Majorino|Diedrich Bader
+3|2008|125|Jon Turtletaub|National Treasure 2: Book Of Secrets|Alice|Nicholas Cage|Jon Voight|Harvey Keitel|Ed Harris|Diane Kruger|Justin Bartha|Bruce Greenwood
+5|1999|89|Mike Judge|Office Space|Jeffry|Ron Livingston|Stephen Root|Gary Cole|Jennifer Anniston
+4|2008|127|Richard LaGravenese|P.S. I Love You|Alice|Hilary Swank|Gerard Butler|Lisa Kudrow|Harry Connick, Jr.|Gina Gershon|Jeffrey Dean Morgan|Kathy Bates
+2|2007|96|Mennan Yapo|Premonition|Jeffry|Sandra Bullock
+4|2009|123|Grant Nieporte|Seven Pounds|Jeffry|Will Smith|Rosario Dawson|Michael Ealy|Barry Pepper|Woody Harrelson
+5|2004|100|Edgar Wright|Shaun of the Dead|Alice|Simon Pegg|Nick Frost|Kate Ashfield|Lucy Davis|Dylan Morgan|Bill Nighy|Penelope Wilton
+3|2006|105|Andy Fickman|She's the Man|Bob|Amanda Bynes|Channing Tatum|Laura Ramsey|Vinnie Jones|Robert Hoffman|Alex Breckenridge|Julie Hagerty
+3|2007|125|Antione Fuqua|Shooter|Bob|Mark Wahlberg|Michael Peña|Danny Glover|Kate Mara|Elias Koteas|Rhonda Mitra|Rade Sherbedgia|Ned Beatty
 5|2009|127|J. J. Abrams|Star Trek|Jeffry|Chris Pine|Zachary Quinto|Simon Pegg|Leonard Nimoy|Zoe Saldana|Karl Urban|Bruce Greenwood|Eric Bana|John Cho|Anton Yelchin
 5|2013|132|J. J. Abrams|Star Trek: Into Darkness|Jeffry|Chris Pine|Zachary Quinto|Zoe Saldana|Benedict Cumberbatch|Karl Urban|Simon Pegg|John Cho|Anton Yelchin|Bruce Greenwood
+3|2008|97|Rob Reiner|The Bucket List|Alice|Jack Nicholson|Morgan Freeman
+3|2008|104|Edmund H. North|The Day the Earth Stood Still|Alice|Keanu Reeves|Jennifer Connelly|Jaden Smith|John Cleese|Jon Hamm|Kathy Bates
+5|2007|113|Chris Weitz|The Golden Compass|Alice|Nicole Kidman|Sam Elliot|Exa Green|Dakota Blue Richards|Daniel Craig
+2|2005|91|Takashi Shimizu|The Grudge|Bob|Sarah Michelle Gellar|Jason Behr|Kadee Strickland|Clea DuVall|Bill Pullman
+5|2004|115|Brad Bird|The Incredibles|Alice|Craig T. Nelson|Samuel L. Jackson|Holly Hunter|Jason Lee
+2|2008|101|Mark Waters|The Spiderwick Chronicles|Alice|Freddie Highmore|Mary -Louis Parker|Nick Nolte|Joan Plowright|David Strathairn
+3|2009|96|Robert Luketic|The Ugly Truth|Bob|Katherine Heigl|Gerard Butler|Eric Winter|John Michael Higgins|Nick Searcy|Kevin Connolly|Cheryl Hines
+4|1998|90|Frank Coraci|The Waterboy|Bob|Adam Sandler|Kathy Bates|Fairuza Balk|Jerry Reed|Henry Winkler
+4|2008|106|Ben Stiller|Tropic Thunder|Alice|Jack Black|Ben Stiller|Rober Downey Jr.|Steve Coogan|Jay Baruchel|Danny McBride|Brandon T. Jackson|Bill Hader|Nick Nolte
+3|2007|100|Walt Becker|Wild Hogs|Jeffry|Tim Allen|John Travolta|Martin Lawrence|Willian H. Macy|Marisa Tomei|Jill Henessey|Ray Liotta
+5|2010|88|Ruben Fleischer|Zombieland|Bob|Woody Harrelson|Jesse Eisenberg|Emma Stone|Abigail Breslin|Bill Murray
+4|2006|96|Tom Dey|failure to launch|Jeffry|Matthew McConaughey|Sara Jessica Parker|Zooey Deschanel|Justin Bartha|Bradley Cooper|Terry Bradshaw
+3|2007|136|Nancy Meyers|the Holiday|Jeffry|Cameron Diaz|Kate Winslet|Jude Law|Jack Black
+5|1997|94|Jon Amiel|the Man who knew too little|Jeffry|Bill Murray|Peter Gallagher|Joanne Whalley|Richard Wilson|Alfred Molina
+4|1998|97|Frank Coraci|the Wedding Singer|Jeffry|Adam Sandler|Drew Barrymore|Christine Taylor

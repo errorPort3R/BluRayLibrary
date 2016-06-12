@@ -12,12 +12,19 @@
 <b>Runtime:</b>{{runtime}} minutes<br>
 <b>Released:</b>{{year}}<br>
 <b>Rating:</b>{{rating}}/5
+<br>
+<form action="/home" method="post">
+    <button type="submit">Home Page</button>
+</form>
 
 
-<form action="/toggle-edit" method="post">
+<form action="/movie?id={{id}}" method="get">
     <div class="mid-field-buttons">
+        <input type="hidden" name="show-edit" value="true">
         {{^show-edit-form}}
+        {{#can-edit}}
         <button type="submit">Edit Movie</button>
+        {{/can-edit}}
         {{/show-edit-form}}
     </div>
 </form>
@@ -40,7 +47,8 @@
         &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
         <input type="hidden" name="id" value="{{id}}">
         <button type="submit">Update</button>
-    </form>
+    </form><form action="/toggle-edit" method="post" style="display: inline-block;">
+    <button type="submit"style="display: inline-block;">Cancel</button></form>
     {{/show-edit-form}}
 </div>
 </body>

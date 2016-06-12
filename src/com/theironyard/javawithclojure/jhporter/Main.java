@@ -21,11 +21,12 @@ public class Main
     static ArrayList<Movie> pageList;
     static int currentPage = 1;
     static int totalPages= 1;
-    static boolean firstpage;
-    static boolean lastpage;
+    static boolean firstpage = true;
+    static boolean lastpage = false;
     static boolean showAddForm=false;
     static boolean showEditForm=false;
     static boolean signedIn = false;
+    static int editPageId;
 
 
 
@@ -43,7 +44,6 @@ public class Main
                 (request, response) ->
                 {
                     //get values for page
-                    setPageButtonStatus();
                     double numOfEntries = movieArchive.size();
                     int totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
                     canDelete =  new ArrayList<>();
@@ -111,19 +111,24 @@ public class Main
                 "/movie",
                 (request, response) ->
                 {
-                    String idStr = request.queryParams("id");
-                    int identity = -1;
+                    int identity;
+                    if (request.queryParams("show-edit") != null)
+                    {
+                        showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
+                    }
+                    if (request.queryParams("id") != null)
+                    {
+                        identity = Integer.valueOf(request.queryParams("id"));
+                        editPageId = identity;
+                    }
+                    else
+                    {
+                        identity = editPageId;
+                    }
                     Movie movie = null;
+                    int spotInList = findMovie(identity);
+                    movie = movieArchive.get(spotInList);
 
-                     if (idStr != null)
-                    {
-                        identity = Integer.valueOf(idStr);
-                    }
-                    if (identity != -1)
-                    {
-                        int spotInList = findMovie(identity);
-                        movie = movieArchive.get(spotInList);
-                    }
                     HashMap m = new HashMap();
                     if (movie !=null)
                     {
@@ -134,7 +139,8 @@ public class Main
                         m.put("rating", movie.rating);
                         m.put("year", movie.releaseYear);
                         m.put("id", movie.id);
-
+                        m.put("can-edit", movie.canDelete);
+                        m.put("show-edit-form",showEditForm);
                     }
                     return new ModelAndView(m, "movie.html");
                 },
@@ -143,29 +149,90 @@ public class Main
         );
 
         Spark.post(
+                "/next-page",
+                (request, response ) ->
+                {
+                    currentPage++;
+                    if (currentPage == 1)
+                    {
+                        firstpage = true;
+                    }
+                    else
+                    {
+                        firstpage= false;
+                    }
+
+                    if (currentPage == totalPages)
+                    {
+                        lastpage = true;
+                    }
+                    else
+                    {
+                        lastpage = false;
+                    }
+                    response.redirect("/");
+                    return "";
+                }
+        );
+        Spark.post(
+                "/previous-page",
+                (request, response ) ->
+                {
+                    currentPage--;
+                    if (currentPage == 1)
+                    {
+                        firstpage = true;
+                    }
+                    else
+                    {
+                        firstpage= false;
+                    }
+
+                    if (currentPage == totalPages)
+                    {
+                        lastpage = true;
+                    }
+                    else
+                    {
+                        lastpage= false;
+                    }
+
+                    response.redirect("/");
+                    return "";
+                }
+        );
+        Spark.post(
                 "/select-page",
                 (request, response ) ->
                 {
                     int chosenPage=currentPage;
                     String pageStr = request.queryParams("pageselected");
-                    if(pageStr.equals("next"))
+                    if (pageStr.isEmpty() || Integer.valueOf(pageStr)>totalPages ||Integer.valueOf(pageStr)<1)
                     {
-                        currentPage++;
-                    }
-                    else if (pageStr.equals("previous"))
-                    {
-                        currentPage--;
-                    }
-                    else if (pageStr.isEmpty() || Integer.valueOf(pageStr)>totalPages ||Integer.valueOf(pageStr)<1)
-                    {
-                        //redirect for new information
+
                     }
                     else
                     {
                         chosenPage = Integer.valueOf(pageStr);
                         currentPage = chosenPage;
                     }
-                    setPageButtonStatus();
+                    if (currentPage == 1)
+                    {
+                        firstpage = true;
+                    }
+                    else
+                    {
+                        firstpage= false;
+                    }
+
+                    if (currentPage == totalPages)
+                    {
+                        lastpage = true;
+                    }
+                    else
+                    {
+                        lastpage= false;
+                    }
                     response.redirect("/");
                     return "";
                 }
@@ -208,7 +275,6 @@ public class Main
                         System.out.println("Invalid user!");
                     }
 
-
                     response.redirect("/");
                     return "";
                 }
@@ -228,6 +294,7 @@ public class Main
                     String runtimeStr = request.queryParams("runtime");
                     String yearStr = request.queryParams("year");
                     int runtime;
+
                     if (runtimeStr != null && runtimeStr.matches("[0-9]+"))
                     {
                         runtime = Integer.valueOf(runtimeStr);
@@ -273,7 +340,6 @@ public class Main
                 "/edit-movie",
                 (request, response) ->
                 {
-
                     Session session = request.session();
                     String username = session.attribute("username");
                     ArrayList<String> actors = new ArrayList();
@@ -320,24 +386,14 @@ public class Main
                         }
                         actors.add(cleanField);
                     }
-                    Movie newMovie = new Movie(title, actors, director, runtime, rating, year, username);
+                    Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
                     movieArchive.remove(spotInList);
                     movieArchive.add(newMovie);
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
-                    showEditForm = false;
-
-                    HashMap m = new HashMap();
-                    m.put("title", movie.title);
-                    m.put("actors", movie.actors);
-                    m.put("director", movie.director);
-                    m.put("runtime", movie.minutesRuntime);
-                    m.put("rating", movie.rating);
-                    m.put("year", movie.releaseYear);
-                    m.put("id", movie.id);
 
                     session.attribute("username", username);
-                    response.redirect("/movie");
+                    response.redirect(request.headers("Referer"));
                     return"";
                 }
         );
@@ -358,7 +414,7 @@ public class Main
                 {
                     showEditForm = !showEditForm;
 
-                    response.redirect("/movie");
+                    response.redirect(request.headers("Referer"));
                     return"";
                 }
         );
@@ -387,30 +443,17 @@ public class Main
                     response.redirect("/");
                     return"";
                 }
-
+        );
+        Spark.post(
+                "/home",
+                (request, response) ->
+                {
+                    response.redirect("/");
+                    return"";
+                }
         );
     }
 
-    public static void setPageButtonStatus()
-    {
-        if (currentPage == 1)
-        {
-            firstpage = true;
-        }
-        else
-        {
-            firstpage= false;
-        }
-
-        if (currentPage == totalPages)
-        {
-            lastpage = true;
-        }
-        else
-        {
-            lastpage= false;
-        }
-    }
 
     public static void loadMovieArchive(String fileLoc)
     {
@@ -522,6 +565,7 @@ public class Main
             if(movieArchive.get(i).id == identity)
             {
                 location = i;
+                i=movieArchive.size();
             }
         }
         return location;

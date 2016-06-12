@@ -33,15 +33,12 @@ Welcome {{current-user}}<br>
 {{/current-page-list}}
 
 {{^firstpage}}
-<form action="/select-page" method="post" style="display: inline-block;">
-    <input type="hidden" name="pageselected" value="previous">
+<form action="/previous-page" method="post" style="display: inline-block;">
     <button type="submit">Prev</button>
 </form>
 {{/firstpage}}
-
 {{^lastpage}}
-<form action="/select-page" method="post" style="display: inline-block;">
-    <input type="hidden" name="pageselected" value="next">
+<form action="/next-page" method="post" style="display: inline-block;">
     <button type="submit">Next</button>
 </form>
 {{/lastpage}}<br>
@@ -79,7 +76,7 @@ Page {{pagenumber}} of {{totalpages}}
         &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
         <button type="submit">Add Movie</button></form>
     <form action="/toggle-add" method="post" style="display: inline-block;">
-        <button type="submit">Cancel</button></form>
+        <button type="submit" style="display: inline-block;">Cancel</button></form>
    {{/show-movie-form}}
 </div>
 </body>
