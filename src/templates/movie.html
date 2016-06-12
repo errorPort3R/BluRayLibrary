@@ -32,7 +32,7 @@
     {{#show-edit-form}}
     <form action="/edit-movie" method="post">
         <input type="text" name="title" value="{{title}}" style="width:400px;"><br><br>
-        <textarea name="actors" value="{{#actors}}{{String}}{{/actors}}" style="width:400px; height:80px;"></textarea><br><br>
+        <textarea name="actors"  style="width:400px; height:80px;">{{#actors}}{{.}}{{/actors}}</textarea><br><br>
         <input type="text" name="director" value="{{director}}" style="width:400px;"><br>
         Runtime<input type="number" name="runtime" value="{{runtime}}" style="width:40px;"> minutes<br>
         Year released<input type="number" name="year" value="{{year}}" style="width:75px;"><br>

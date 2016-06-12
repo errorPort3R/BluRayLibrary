@@ -99,8 +99,8 @@ public class Main
                     h.put("current-page-list",pageList);
                     h.put("firstpage", firstpage);
                     h.put("lastpage", lastpage);
-                    h.put("show-movie-form",showAddForm);//add method for this
-                    h.put("signed-in", signedIn);//add method for this
+                    h.put("show-movie-form",showAddForm);
+                    h.put("signed-in", signedIn);
                     if (username!=null)
                     {
                         h.put("current-user", username);
@@ -303,6 +303,7 @@ public class Main
                 (request, response) ->
                 {
                     int identity;
+                    int spotInList=-1;
                     if (request.queryParams("show-edit") != null)
                     {
                         showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
@@ -317,7 +318,7 @@ public class Main
                         identity = editPageId;
                     }
                     Movie movie = null;
-                    int spotInList = findMovie(identity);
+                    spotInList = findMovie(identity);
                     movie = movieArchive.get(spotInList);
 
                     HashMap m = new HashMap();
@@ -390,12 +391,13 @@ public class Main
                     }
                     Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
                     movieArchive.remove(spotInList);
+                    editPageId = newMovie.id;
                     movieArchive.add(newMovie);
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
 
                     session.attribute("username", username);
-                    response.redirect(request.headers("Referer"));
+                    response.redirect("/");
                     return"";
                 }
         );
@@ -573,4 +575,5 @@ public class Main
         }
         return location;
     }
+
 }

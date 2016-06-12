@@ -7,7 +7,7 @@
 3|2008|112|Andy Tennant|Fool's Gold|Alice|Matthew McConaughey|Kate Hudson|Donald Sutherland|Ewen Bremner|Alexis Oziena|Kevin Hart|Ray Winstone
 4|2003|97|Mark Waters|Freaky Friday|Jeffry|Jamie Lee Curtis|Lindsay Lohan|Chad Michael Murray|mark Harmon
 5|2007|121|Edgar Wright|Hot Fuzz|Jeffry|Simon Pegg|Nick Frost
-5|1991|100|Michael Lehmann|Hudson Hawk|Jeffry|Danny Aiello|Bruce Willis|Andie MacDowell|James Coburn
+5|1991|100|Michael Lehmann|Hudson Hawk|Jeffry|Bruce Willis|Danny Aiello|Andie MacDowell|James Coburn
 5|2006|87|Mike Judge|Idiocracy|Bob|Luke Wilson|Maya Rudolph|Dax Shepard
 5|2008|125|Jon Favreau|Iron Man|Alice|Robert Downey Jr.|Terrence Howard|Jeff Bridges|Gwyneth Paltrow|Shaun Taub
 5|2001|91|Dennie Gordon|Joe Dirt|Jeffry|David Spade|Dennis Miller|Brittany Daniel|Christopher Walken
@@ -25,7 +25,7 @@
 4|2008|127|Richard LaGravenese|P.S. I Love You|Alice|Hilary Swank|Gerard Butler|Lisa Kudrow|Harry Connick, Jr.|Gina Gershon|Jeffrey Dean Morgan|Kathy Bates
 2|2007|96|Mennan Yapo|Premonition|Jeffry|Sandra Bullock
 4|2009|123|Grant Nieporte|Seven Pounds|Jeffry|Will Smith|Rosario Dawson|Michael Ealy|Barry Pepper|Woody Harrelson
-5|2004|100|Edgar Wright|Shaun of the Dead|Alice|Simon Pegg|Nick Frost|Kate Ashfield|Lucy Davis|Dylan Morgan|Bill Nighy|Penelope Wilton
+5|2004|100|Edgar Wright|Shaun of the Dead|Jeffry|Simon Pegg|Nick Frost|Kate Ashfield|Lucy Davis|Dylan Morgan|Bill Nighy|Penelope Wilton
 3|2006|105|Andy Fickman|She's the Man|Bob|Amanda Bynes|Channing Tatum|Laura Ramsey|Vinnie Jones|Robert Hoffman|Alex Breckenridge|Julie Hagerty
 3|2007|125|Antione Fuqua|Shooter|Bob|Mark Wahlberg|Michael Peña|Danny Glover|Kate Mara|Elias Koteas|Rhonda Mitra|Rade Sherbedgia|Ned Beatty
 5|2009|127|J. J. Abrams|Star Trek|Jeffry|Chris Pine|Zachary Quinto|Simon Pegg|Leonard Nimoy|Zoe Saldana|Karl Urban|Bruce Greenwood|Eric Bana|John Cho|Anton Yelchin
