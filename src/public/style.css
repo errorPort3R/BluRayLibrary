@@ -3,6 +3,7 @@
      position: absolute;
      top: 120px;
      right: 40px;
+     border-style:double;
 }
 .mid-field-buttons
 {
@@ -12,4 +13,8 @@
         width: 100%;
         text-align: center;
 
+}
+body
+{
+    background-color: orange;
 }

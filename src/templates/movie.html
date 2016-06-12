@@ -47,6 +47,7 @@
         <button type="submit">Update</button>
     </form>
     <form action="/toggle-edit" method="post" style="display: inline-block;">
+        <input type="hidden" name="id" value="{{id}}">
         <button type="submit" style="display: inline-block;">Cancel</button>
     </form>
     {{/show-edit-form}}

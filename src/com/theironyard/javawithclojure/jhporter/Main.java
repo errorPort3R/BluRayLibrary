@@ -392,6 +392,7 @@ public class Main
                     Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
                     movieArchive.remove(spotInList);
                     editPageId = newMovie.id;
+                    showEditForm = false;
                     movieArchive.add(newMovie);
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
@@ -418,7 +419,7 @@ public class Main
                 {
                     showEditForm = !showEditForm;
 
-                    response.redirect(request.headers("Referer"));
+                    response.redirect("/movie");
                     return"";
                 }
         );
