@@ -42,13 +42,18 @@ public class Main
                     User user;
                     if (username == null||username.isEmpty())
                     {
-                       user = new User(username);
+                        user = new User(username);
                         user.signedIn = false;
+                    }
+                    else if (userMap.get(username) == null)
+                    {
+                        userMap.put(username, new User(username));
+                        user = userMap.get(username);
+                        user.signedIn = true;
                     }
                     else
                     {
                         user = userMap.get(username);
-                        user.signedIn = true;
                     }
 
                     //populate pageList

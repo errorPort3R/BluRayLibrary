@@ -9,17 +9,22 @@ public class User
 {
     String name;
     ArrayList<Movie> pageList;
-    int currentPage = 1;
+    int currentPage;
     int totalPages;
-    boolean firstpage = true;
+    boolean firstpage;
     boolean lastpage;
-    boolean showAddForm=false;
-    boolean showEditForm = false;
-    boolean signedIn = false;
+    boolean showAddForm;
+    boolean showEditForm;
+    boolean signedIn;
     int editPageId;
 
     public User(String name)
     {
         this.name = name;
+        currentPage=1;
+        firstpage = true;
+        showAddForm=false;
+        showEditForm = false;
+        signedIn = false;
     }
 }
