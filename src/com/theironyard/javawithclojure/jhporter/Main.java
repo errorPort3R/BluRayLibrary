@@ -17,16 +17,7 @@ public class Main
     static String MOVIE_FILE_LOCATION = "movies.txt";
     static String USER_FILE_LOCATION = "users.txt";
     static HashMap<String, String> users;
-    static ArrayList<Boolean> canDelete;
-    static ArrayList<Movie> pageList;
-    static int currentPage = 1;
-    static int totalPages;
-    static boolean firstpage = true;
-    static boolean lastpage;
-    static boolean showAddForm=false;
-    static boolean showEditForm = false;
-    static boolean signedIn = false;
-    static int editPageId;
+    static HashMap<String, User> userMap = new HashMap<>();
 
 
 
@@ -45,62 +36,64 @@ public class Main
                 {
                     //get values for page
                     double numOfEntries = movieArchive.size();
-                    totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
+                    int totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
                     Session session = request.session();
                     String username = session.attribute("username");
+                    User user;
+                    if (username == null||username.isEmpty())
+                    {
+                       user = new User(username);
+                        user.signedIn = false;
+                    }
+                    else
+                    {
+                        user = userMap.get(username);
+                        user.signedIn = true;
+                    }
 
-                    //build page list
-                    if (username == null || username.isEmpty())
-                    {
-                        signedIn = false;
-                    }
-                    else
-                    {
-                        signedIn = true;
-                    }
                     //populate pageList
-                    pageList = new ArrayList<>();
-                    if (totalPages>currentPage)
+                    user.pageList = new ArrayList<>();
+                    if (totalPages>user.currentPage)
                     {
-                        for (int i = ((currentPage - 1) * MOVIES_PER_PAGE); i < (currentPage * MOVIES_PER_PAGE); i++)
+                        for (int i = ((user.currentPage - 1) * MOVIES_PER_PAGE); i < (user.currentPage * MOVIES_PER_PAGE); i++)
                         {
-                            pageList.add(movieArchive.get(i));
+                            user.pageList.add(movieArchive.get(i));
                         }
                     }
                     else
                     {
-                        for (int i = ((currentPage - 1) * MOVIES_PER_PAGE); i < movieArchive.size(); i++)
+                        for (int i = ((user.currentPage - 1) * MOVIES_PER_PAGE); i < movieArchive.size(); i++)
                         {
-                            pageList.add(movieArchive.get(i));
+                            user.pageList.add(movieArchive.get(i));
                         }
                     }
-                    for(int i = 0;i<pageList.size();i++)
+                    for(int i = 0;i<user.pageList.size();i++)
                     {
                         if (username != null)
                         {
-                            if (pageList.get(i).owner.equals(username))
+                            if (user.pageList.get(i).owner.equals(username))
                             {
-                                pageList.get(i).canDelete = true;
+                                user.pageList.get(i).canDelete = true;
                             }
                                 else
                             {
-                                pageList.get(i).canDelete = false;
+                                user.pageList.get(i).canDelete = false;
                             }
                         }
                         else
                         {
-                            pageList.get(i).canDelete = false;
+                            user.pageList.get(i).canDelete = false;
                         }
                     }
 
                     HashMap h = new HashMap();
                     h.put("totalpages",totalPages);
-                    h.put("pagenumber", currentPage);
-                    h.put("current-page-list",pageList);
-                    h.put("firstpage", firstpage);
-                    h.put("lastpage", lastpage);
-                    h.put("show-movie-form",showAddForm);
-                    h.put("signed-in", signedIn);
+                    h.put("pagenumber", user.currentPage);
+                    h.put("current-page-list",user.pageList);
+                    h.put("firstpage", user.firstpage);
+                    h.put("lastpage", user.lastpage);
+                    h.put("show-movie-form",user.showAddForm);
+                    h.put("signed-in", user.signedIn);
                     if (username!=null)
                     {
                         h.put("current-user", username);
@@ -113,24 +106,29 @@ public class Main
                 "/next-page",
                 (request, response ) ->
                 {
-                    currentPage++;
-                    if (currentPage == 1)
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
+
+                    user.currentPage++;
+                    if (user.currentPage == 1)
                     {
-                        firstpage = true;
+                        user.firstpage = true;
                     }
                     else
                     {
-                        firstpage= false;
+                        user.firstpage= false;
                     }
 
-                    if (currentPage == totalPages)
+                    if (user.currentPage == user.totalPages)
                     {
-                        lastpage = true;
+                        user.lastpage = true;
                     }
                     else
                     {
-                        lastpage = false;
+                        user.lastpage = false;
                     }
+                    session.attribute("username", username);
                     response.redirect("/");
                     return "";
                 }
@@ -139,24 +137,31 @@ public class Main
                 "/previous-page",
                 (request, response ) ->
                 {
-                    currentPage--;
-                    if (currentPage == 1)
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
+
+
+                    user.currentPage--;
+                    if (user.currentPage == 1)
                     {
-                        firstpage = true;
+                        user.firstpage = true;
                     }
                     else
                     {
-                        firstpage= false;
+                        user.firstpage= false;
                     }
 
-                    if (currentPage == totalPages)
+                    if (user.currentPage == user.totalPages)
                     {
-                        lastpage = true;
+                        user.lastpage = true;
                     }
                     else
                     {
-                        lastpage = false;
+                        user.lastpage = false;
                     }
+
+                    session.attribute("username", username);
                     response.redirect("/");
                     return "";
                 }
@@ -165,9 +170,13 @@ public class Main
                 "/selectpage",
                 (request, response ) ->
                 {
-                    int chosenPage=currentPage;
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
+
+                    int chosenPage=user.currentPage;
                     String pageStr = request.queryParams("pageselected");
-                    if (pageStr.isEmpty() || Integer.valueOf(pageStr)>totalPages ||Integer.valueOf(pageStr)<1)
+                    if (pageStr.isEmpty() || Integer.valueOf(pageStr)>user.totalPages ||Integer.valueOf(pageStr)<1)
                     {
                         response.redirect("/");
                         return"";
@@ -175,25 +184,27 @@ public class Main
                     else
                     {
                         chosenPage = Integer.valueOf(pageStr);
-                        currentPage = chosenPage;
+                        user.currentPage = chosenPage;
                     }
-                    if (currentPage == 1)
+                    if (user.currentPage == 1)
                     {
-                        firstpage = true;
+                        user.firstpage = true;
                     }
                     else
                     {
-                        firstpage= false;
+                        user.firstpage= false;
                     }
 
-                    if (currentPage == totalPages)
+                    if (user.currentPage == user.totalPages)
                     {
-                        lastpage = true;
+                        user.lastpage = true;
                     }
                     else
                     {
-                        lastpage= false;
+                        user.lastpage= false;
                     }
+
+                    session.attribute("username", username);
 
                     response.redirect("/");
                     return "";
@@ -206,6 +217,7 @@ public class Main
                     Session session = request.session();
                     String username = request.queryParams("username");
                     String password = request.queryParams("password");
+                    User user;
 
                     //start hashmap of users if one isnt loaded
                     if(users == null)
@@ -225,12 +237,14 @@ public class Main
                         users.put(username,password);
                         saveUsers(USER_FILE_LOCATION);
                         session.attribute("username", username);
-                        signedIn=true;
+                        user = new User(username);
+                        user.signedIn=true;
                     }
                     else if (users.get(username).equals(password))
                     {
                         session.attribute("username", username);
-                        signedIn = true;
+                        user = userMap.get(username);
+                        user.signedIn = true;
                     }
                     else
                     {
@@ -248,6 +262,7 @@ public class Main
 
                     Session session = request.session();
                     String username = session.attribute("username");
+                    User user = userMap.get(username);
                     ArrayList<String> actors = new ArrayList();
                     String title = request.queryParams("title");
                     String director = request.queryParams("director");
@@ -292,8 +307,9 @@ public class Main
                     movieArchive.add(newMovie);
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
-                    showAddForm = false;
+                    user.showAddForm = false;
 
+                    session.attribute("username", username);
                     response.redirect("/");
                     return"";
                 }
@@ -302,20 +318,24 @@ public class Main
                 "/movie",
                 (request, response) ->
                 {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
+
                     int identity;
                     int spotInList=-1;
                     if (request.queryParams("show-edit") != null)
                     {
-                        showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
+                        user.showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
                     }
                     if (request.queryParams("id") != null)
                     {
                         identity = Integer.valueOf(request.queryParams("id"));
-                        editPageId = identity;
+                        user.editPageId = identity;
                     }
                     else
                     {
-                        identity = editPageId;
+                        identity = user.editPageId;
                     }
                     Movie movie = null;
                     spotInList = findMovie(identity);
@@ -332,8 +352,10 @@ public class Main
                         m.put("year", movie.releaseYear);
                         m.put("id", movie.id);
                         m.put("can-edit", movie.canDelete);
-                        m.put("show-edit-form",showEditForm);
+                        m.put("show-edit-form",user.showEditForm);
                     }
+
+                    session.attribute("username", username);
                     return new ModelAndView(m, "movie.html");
                 },
                 new MustacheTemplateEngine()
@@ -345,6 +367,8 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
+                    User user = userMap.get(username);
+
                     ArrayList<String> actors = new ArrayList();
                     String title = request.queryParams("title");
                     String director = request.queryParams("director");
@@ -391,8 +415,8 @@ public class Main
                     }
                     Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
                     movieArchive.remove(spotInList);
-                    editPageId = newMovie.id;
-                    showEditForm = false;
+                    user.editPageId = newMovie.id;
+                    user.showEditForm = false;
                     movieArchive.add(newMovie);
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
@@ -407,8 +431,13 @@ public class Main
                 "/toggle-add",
                 (request, response) ->
                 {
-                    showAddForm = !showAddForm;
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
 
+                    user.showAddForm = !user.showAddForm;
+
+                    session.attribute("username", username);
                     response.redirect("/");
                     return"";
                 }
@@ -417,8 +446,13 @@ public class Main
                 "/toggle-edit",
                 (request, response) ->
                 {
-                    showEditForm = !showEditForm;
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
 
+                    user.showEditForm = !user.showEditForm;
+
+                    session.attribute("username", username);
                     response.redirect("/movie");
                     return"";
                 }
@@ -439,6 +473,9 @@ public class Main
                 (request, response) ->
                 {
                     Session session = request.session();
+                    String username = session.attribute("username");
+                    User user = userMap.get(username);
+
                     int identity = Integer.valueOf(request.queryParams("id"));
                     int spotInList = -1;
                     spotInList = findMovie(identity);
@@ -446,6 +483,7 @@ public class Main
                     Collections.sort(movieArchive);
                     saveMovieArchive(MOVIE_FILE_LOCATION);
 
+                    session.attribute("username", username);
                     response.redirect("/");
                     return"";
                 }
@@ -454,6 +492,7 @@ public class Main
                 "/home",
                 (request, response) ->
                 {
+
                     response.redirect("/");
                     return"";
                 }
@@ -536,6 +575,7 @@ public class Main
                 String line = fileScanner.nextLine();
                 String[] fields = line.split("\\|");
                 users.put(fields[0],fields[1]);
+                userMap.put(fields[0],new User(fields[0]));
             }
         }
         catch (FileNotFoundException e)
