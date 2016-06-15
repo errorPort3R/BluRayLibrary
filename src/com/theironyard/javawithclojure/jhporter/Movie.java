@@ -22,6 +22,10 @@ public class Movie implements Comparable
     boolean canDelete;
 
 
+    public Movie()
+    {
+    }
+
     public Movie(int id, String title, String actors, String director, int minutesRuntime, int releaseYear, int rating, int userId) {
         this.id = id;
         this.title = title;
@@ -58,6 +62,96 @@ public class Movie implements Comparable
         this.minutesRuntime = minutesRuntime;
         this.releaseYear = releaseYear;
         this.rating = rating;
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public ArrayList<String> getActors()
+    {
+        return actors;
+    }
+
+    public void setActors(ArrayList<String> actors)
+    {
+        this.actors = actors;
+    }
+
+    public String getDirector()
+    {
+        return director;
+    }
+
+    public void setDirector(String director)
+    {
+        this.director = director;
+    }
+
+    public int getMinutesRuntime()
+    {
+        return minutesRuntime;
+    }
+
+    public void setMinutesRuntime(int minutesRuntime)
+    {
+        this.minutesRuntime = minutesRuntime;
+    }
+
+    public int getReleaseYear()
+    {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(int releaseYear)
+    {
+        this.releaseYear = releaseYear;
+    }
+
+    public int getRating()
+    {
+        return rating;
+    }
+
+    public void setRating(int rating)
+    {
+        this.rating = rating;
+    }
+
+    public int getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(int userId)
+    {
+        this.userId = userId;
+    }
+
+    public boolean isCanDelete()
+    {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete)
+    {
+        this.canDelete = canDelete;
     }
 
     @Override

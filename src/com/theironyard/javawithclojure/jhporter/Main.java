@@ -19,13 +19,19 @@ public class Main
     static User unknownUser = new User(-1,"anonymous","none");;
     static int MOVIES_PER_PAGE = 20;
 
+    public static void createTables(Connection conn) throws SQLException
+    {
+        Statement stmt = conn.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS movies (id IDENTITY, title VARCHAR, actors VARCHAR, director VARCHAR, minutes_runtime INT, release_year INT, rating INT, user_id INT)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS users (id IDENTITY, name VARCHAR, password VARCHAR)");
+    }
+
     public static void main(String[] args) throws SQLException
     {
         Server.createWebServer().start();
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
         Statement stmt = conn.createStatement();
-        stmt.execute("CREATE TABLE IF NOT EXISTS movies (id IDENTITY, title VARCHAR, actors VARCHAR, director VARCHAR, minutes_runtime INT, release_year INT, rating INT, user_id INT)");
-        stmt.execute("CREATE TABLE IF NOT EXISTS users (id IDENTITY, name VARCHAR, password VARCHAR)");
+        createTables(conn);
 
         Spark.staticFileLocation("/public");
         Spark.init();
