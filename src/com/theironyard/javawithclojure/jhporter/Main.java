@@ -6,24 +6,18 @@ import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
 
-import static com.theironyard.javawithclojure.jhporter.DataMigrator.movieArchive;
+
 
 public class Main
 {
-
+    static boolean showAddForm = false;
+    static boolean showEditForm = false;
+    static boolean signedIn = false;
+    static User unknownUser = new User(-1,"anonymous","none");;
     static int MOVIES_PER_PAGE = 20;
-    static String MOVIE_FILE_LOCATION = "movies.txt";
-    static String USER_FILE_LOCATION = "users.txt";
-//    static HashMap<String, String> users;
-//    static HashMap<String, User> userMap = new HashMap<>();
-//    static ArrayList<Movie> movieArchive = new ArrayList<>();
-
 
     public static void main(String[] args) throws SQLException
     {
@@ -36,9 +30,6 @@ public class Main
         Spark.staticFileLocation("/public");
         Spark.init();
 
-//        loadMovieArchive(MOVIE_FILE_LOCATION);
-//        loadUsers(USER_FILE_LOCATION);
-
 
         Spark.get(
                 "/",
@@ -46,26 +37,21 @@ public class Main
                 {
                     //get values for page
 
-                    double count=0;
-                    ResultSet results = stmt.executeQuery("SELECT COUNT (id) FROM movies;");
+                    double count=0.0;
+                    ResultSet results = stmt.executeQuery("SELECT COUNT (*) AS count FROM movies");
                     if (results.next())
                     {
-                        count = results.getDouble(0);
+                        count = (double)results.getInt("count");
                     }
-                        int totalPages = (int)Math.ceil(count/MOVIES_PER_PAGE);
+                    int totalPages = (int)Math.ceil(count/MOVIES_PER_PAGE);
                     Session session = request.session();
                     String username = session.attribute("username");
-                    String password = request.queryParams("password");
+
                     User user;
                     if (username == null||username.isEmpty())
                     {
-                        user = new User(-1,"","");
-                        user.signedIn = false;
-                    }
-                    else if (selectUser(conn,username) == null )
-                    {
-                        user = new User(-1,username,"");
-                        user.signedIn = true;
+                        user = unknownUser;
+                        signedIn = false;
                     }
                     else
                     {
@@ -74,8 +60,9 @@ public class Main
 
                     //populate pageList
                     ArrayList<Movie>movieArchive = selectMovies(conn);
+                    Collections.sort(movieArchive);
                     user.pageList = new ArrayList<>();
-                    if (totalPages>user.currentPage)
+                    if (totalPages>user.currentPage || user.currentPage == 1)
                     {
                         for (int i = ((user.currentPage - 1) * MOVIES_PER_PAGE); i < (user.currentPage * MOVIES_PER_PAGE); i++)
                         {
@@ -116,8 +103,8 @@ public class Main
                     h.put("current-page-list",user.pageList);
                     h.put("firstpage", user.firstpage);
                     h.put("lastpage", user.lastpage);
-                    h.put("show-movie-form",user.showAddForm);
-                    h.put("signed-in", user.signedIn);
+                    h.put("show-movie-form",showAddForm);
+                    h.put("signed-in", signedIn);
                     if (username!=null)
                     {
                         h.put("current-user", username);
@@ -133,6 +120,10 @@ public class Main
                     Session session = request.session();
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
+                    if (user == null)
+                    {
+                        user = unknownUser;
+                    }
 
                     user.currentPage++;
                     if (user.currentPage == 1)
@@ -164,6 +155,10 @@ public class Main
                     Session session = request.session();
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
+                    if (user == null)
+                    {
+                        user = unknownUser;
+                    }
 
 
                     user.currentPage--;
@@ -197,6 +192,10 @@ public class Main
                     Session session = request.session();
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
+                    if (user == null)
+                    {
+                        user = unknownUser;
+                    }
 
                     int chosenPage=user.currentPage;
                     String pageStr = request.queryParams("pageselected");
@@ -245,6 +244,7 @@ public class Main
 
                     if (username.isEmpty() || password.isEmpty())
                     {
+                        signedIn = false;
                         response.redirect("/");
                         return "";
                     }
@@ -255,17 +255,18 @@ public class Main
                         insertUser(conn,username,password);
                         session.attribute("username", username);
                         user = selectUser(conn, username);
-                        user.signedIn=true;
+                        signedIn = true;
                     }
                     else if (selectUser(conn,username).password.equals(password))
                     {
                         session.attribute("username", username);
                         user = selectUser(conn, username);
-                        user.signedIn = true;
+                        signedIn = true;
                     }
                     else
                     {
                         System.out.println("Invalid user!");
+                        signedIn = false;
                     }
 
                     response.redirect("/");
@@ -322,7 +323,7 @@ public class Main
                     }
                     Movie newMovie = new Movie(title, actors, director, runtime, year, rating, selectUser(conn, username).id);
                     insertMovie(conn, newMovie);
-                    user.showAddForm = false;
+                    showAddForm = false;
 
                     session.attribute("username", username);
                     response.redirect("/");
@@ -336,12 +337,15 @@ public class Main
                     Session session = request.session();
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
+                    if (user == null)
+                    {
+                        user = unknownUser;
+                    }
 
                     int identity;
-                    int spotInList=-1;
                     if (request.queryParams("show-edit") != null)
                     {
-                        user.showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
+                        showEditForm = Boolean.valueOf(request.queryParams("show-edit"));
                     }
                     if (request.queryParams("id") != null)
                     {
@@ -350,9 +354,13 @@ public class Main
                     }
                     else
                     {
-                        identity = user.editPageId;
+                        identity = unknownUser.editPageId;
                     }
                     Movie movie = selectMovie(conn, identity);
+                    if (user.id == movie.userId)
+                    {
+                        movie.canDelete = true;
+                    }
 
                     HashMap m = new HashMap();
                     if (movie !=null)
@@ -365,7 +373,7 @@ public class Main
                         m.put("year", movie.releaseYear);
                         m.put("id", movie.id);
                         m.put("can-edit", movie.canDelete);
-                        m.put("show-edit-form",user.showEditForm);
+                        m.put("show-edit-form",showEditForm);
                     }
 
                     session.attribute("username", username);
@@ -426,7 +434,8 @@ public class Main
                     }
                     Movie newMovie = new Movie(title, actors, director, runtime, year, rating, selectUser(conn, username).id);
                     user.editPageId = newMovie.id;
-                    user.showEditForm = false;
+                    showEditForm = false;
+                    updateMovie(conn, newMovie);
 
                     session.attribute("username", username);
                     response.redirect("/");
@@ -442,7 +451,7 @@ public class Main
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
 
-                    user.showAddForm = !user.showAddForm;
+                    showAddForm = !showAddForm;
 
                     session.attribute("username", username);
                     response.redirect("/");
@@ -457,7 +466,8 @@ public class Main
                     String username = session.attribute("username");
                     User user = selectUser(conn, username);
 
-                    user.showEditForm = !user.showEditForm;
+                    unknownUser.editPageId = Integer.valueOf(request.queryParams("id"));
+                    showEditForm = !showEditForm;
 
                     session.attribute("username", username);
                     response.redirect("/movie");
@@ -508,7 +518,7 @@ public class Main
     public static void insertMovie(Connection conn, Movie movie) throws SQLException
     {
         String actorsStr = "";
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO movie VALUES(NULL,?,?,?,?,?,?,?)");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO movies VALUES(NULL,?,?,?,?,?,?,?)");
         stmt.setString(1,movie.title);
         for (int i =0;i<movie.actors.size();i++)
         {
@@ -532,7 +542,7 @@ public class Main
 
     public static Movie selectMovie(Connection conn, int id) throws SQLException
     {
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies INNER JOIN users ON movies.user_id = users.id WHERE id = ?");
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies JOIN users ON movies.user_id = users.id WHERE movies.id = ?");
         stmt.setInt(1, id);
         ResultSet results = stmt.executeQuery();
         if (results.next())
@@ -551,7 +561,7 @@ public class Main
 
     public static ArrayList<Movie> selectMovies(Connection conn) throws SQLException
     {
-        ArrayList<Movie> movies=null;
+        ArrayList<Movie> movies=new ArrayList<>();
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies INNER JOIN users ON movies.user_id = users.id");
         ResultSet results = stmt.executeQuery();
         while (results.next())
@@ -592,11 +602,12 @@ public class Main
         }
         return movies;
     }
+    //id IDENTITY, title VARCHAR, actors VARCHAR, director VARCHAR, minutes_runtime INT, release_year INT, rating INT, user_id INT
 
     public static void updateMovie(Connection conn, Movie movie) throws SQLException
     {
         String actorsStr = "";
-        PreparedStatement stmt = conn.prepareStatement("UPDATE movies SET title = ?, actors = ?,director = ?,minutes_runtime = ?, release_year = ?, rating = ? WHERE id = ?)");
+        PreparedStatement stmt = conn.prepareStatement("UPDATE movies SET title = ?, actors = ?, director = ?, minutes_runtime = ?, release_year = ?, rating = ? WHERE id = ?");
         stmt.setString(1,movie.title);
         for (int i =0;i<movie.actors.size();i++)
         {
@@ -647,7 +658,5 @@ public class Main
         }
         return null;
     }
-
-
 
 }

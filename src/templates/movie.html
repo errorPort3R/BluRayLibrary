@@ -19,7 +19,8 @@
 
 
 <form action="/movie?id={{id}}" method="get" class="mid-field-buttons">
-        <input type="hidden" name="show-edit" value="true">
+        <input type="hidden" name="show-edit" value="true"/>
+        <input type="hidden" name="id" value="{{id}}"/>
         {{^show-edit-form}}
         {{#can-edit}}
         <button type="submit">Edit Movie</button>
@@ -31,11 +32,11 @@
 <div class="addmovieui">
     {{#show-edit-form}}
     <form action="/edit-movie" method="post">
-        <input type="text" name="title" value="{{title}}" style="width:400px;"><br><br>
+        <input type="text" name="title" value="{{title}}" style="width:400px;"/><br><br>
         <textarea name="actors"  style="width:400px; height:80px;">{{#actors}}{{.}}{{/actors}}</textarea><br><br>
-        <input type="text" name="director" value="{{director}}" style="width:400px;"><br>
-        Runtime<input type="number" name="runtime" value="{{runtime}}" style="width:40px;"> minutes<br>
-        Year released<input type="number" name="year" value="{{year}}" style="width:75px;"><br>
+        <input type="text" name="director" value="{{director}}" style="width:400px;"/><br>
+        Runtime<input type="number" name="runtime" value="{{runtime}}" style="width:40px;"/> minutes<br>
+        Year released<input type="number" name="year" value="{{year}}" style="width:75px;"/><br>
         Rating<br>
         <input type="radio" name="rating" value="1">
         <input type="radio" name="rating" value="2">
@@ -43,11 +44,11 @@
         <input type="radio" name="rating" value="4">
         <input type="radio" name="rating" value="5"> <br>
         &nbsp1&nbsp&nbsp&nbsp&nbsp2&nbsp&nbsp&nbsp3&nbsp&nbsp&nbsp&nbsp4&nbsp&nbsp&nbsp5<br>
-        <input type="hidden" name="id" value="{{id}}">
+        <input type="hidden" name="id" value="{{id}}"/>
         <button type="submit">Update</button>
     </form>
     <form action="/toggle-edit" method="post" style="display: inline-block;">
-        <input type="hidden" name="id" value="{{id}}">
+        <input type="hidden" name="id" value="{{id}}"/>
         <button type="submit" style="display: inline-block;">Cancel</button>
     </form>
     {{/show-edit-form}}

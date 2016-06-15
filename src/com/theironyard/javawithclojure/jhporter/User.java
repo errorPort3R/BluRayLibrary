@@ -16,9 +16,6 @@ public class User
     int totalPages;
     boolean firstpage;
     boolean lastpage;
-    boolean showAddForm;
-    boolean showEditForm;
-    boolean signedIn;
     int editPageId;
 
     public User(int id, String name, String password)
@@ -28,8 +25,5 @@ public class User
         this.password = password;
         currentPage=1;
         firstpage = true;
-        showAddForm=false;
-        showEditForm = false;
-        signedIn = false;
     }
 }

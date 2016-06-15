@@ -50,6 +50,16 @@ public class Movie implements Comparable
         this.userId = userId;
     }
 
+    public Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating)
+    {
+        this.title = title;
+        this.actors = actors;
+        this.director = director;
+        this.minutesRuntime = minutesRuntime;
+        this.releaseYear = releaseYear;
+        this.rating = rating;
+    }
+
     @Override
     public int compareTo(Object o)
     {
