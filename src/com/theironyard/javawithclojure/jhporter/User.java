@@ -7,7 +7,10 @@ import java.util.ArrayList;
  */
 public class User
 {
+
+    int id;
     String name;
+    String password;
     ArrayList<Movie> pageList;
     int currentPage;
     int totalPages;
@@ -18,9 +21,11 @@ public class User
     boolean signedIn;
     int editPageId;
 
-    public User(String name)
+    public User(int id, String name, String password)
     {
+        this.id = id;
         this.name = name;
+        this.password = password;
         currentPage=1;
         firstpage = true;
         showAddForm=false;

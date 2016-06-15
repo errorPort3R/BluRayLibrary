@@ -1,5 +1,6 @@
 package com.theironyard.javawithclojure.jhporter;
 
+import org.h2.tools.Server;
 import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
@@ -8,26 +9,35 @@ import spark.template.mustache.MustacheTemplateEngine;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.sql.*;
 import java.util.*;
+
+import static com.theironyard.javawithclojure.jhporter.DataMigrator.movieArchive;
 
 public class Main
 {
-    static ArrayList<Movie> movieArchive = new ArrayList<>();
+
     static int MOVIES_PER_PAGE = 20;
     static String MOVIE_FILE_LOCATION = "movies.txt";
     static String USER_FILE_LOCATION = "users.txt";
-    static HashMap<String, String> users;
-    static HashMap<String, User> userMap = new HashMap<>();
+//    static HashMap<String, String> users;
+//    static HashMap<String, User> userMap = new HashMap<>();
+//    static ArrayList<Movie> movieArchive = new ArrayList<>();
 
 
-
-    public static void main(String[] args)
+    public static void main(String[] args) throws SQLException
     {
+        Server.createWebServer().start();
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        Statement stmt = conn.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS movies (id IDENTITY, title VARCHAR, actors VARCHAR, director VARCHAR, minutes_runtime INT, release_year INT, rating INT, user_id INT)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS users (id IDENTITY, name VARCHAR, password VARCHAR)");
+
         Spark.staticFileLocation("/public");
         Spark.init();
 
-        loadMovieArchive(MOVIE_FILE_LOCATION);
-        loadUsers(USER_FILE_LOCATION);
+//        loadMovieArchive(MOVIE_FILE_LOCATION);
+//        loadUsers(USER_FILE_LOCATION);
 
 
         Spark.get(
@@ -35,28 +45,35 @@ public class Main
                 (request, response) ->
                 {
                     //get values for page
-                    double numOfEntries = movieArchive.size();
-                    int totalPages = (int)Math.ceil(numOfEntries/MOVIES_PER_PAGE);
+
+                    double count=0;
+                    ResultSet results = stmt.executeQuery("SELECT COUNT (id) FROM movies;");
+                    if (results.next())
+                    {
+                        count = results.getDouble(0);
+                    }
+                        int totalPages = (int)Math.ceil(count/MOVIES_PER_PAGE);
                     Session session = request.session();
                     String username = session.attribute("username");
+                    String password = request.queryParams("password");
                     User user;
                     if (username == null||username.isEmpty())
                     {
-                        user = new User(username);
+                        user = new User(-1,"","");
                         user.signedIn = false;
                     }
-                    else if (userMap.get(username) == null)
+                    else if (selectUser(conn,username) == null )
                     {
-                        userMap.put(username, new User(username));
-                        user = userMap.get(username);
+                        user = new User(-1,username,"");
                         user.signedIn = true;
                     }
                     else
                     {
-                        user = userMap.get(username);
+                        user = selectUser(conn, username);
                     }
 
                     //populate pageList
+                    ArrayList<Movie>movieArchive = selectMovies(conn);
                     user.pageList = new ArrayList<>();
                     if (totalPages>user.currentPage)
                     {
@@ -69,6 +86,8 @@ public class Main
                     {
                         for (int i = ((user.currentPage - 1) * MOVIES_PER_PAGE); i < movieArchive.size(); i++)
                         {
+
+
                             user.pageList.add(movieArchive.get(i));
                         }
                     }
@@ -76,7 +95,7 @@ public class Main
                     {
                         if (username != null)
                         {
-                            if (user.pageList.get(i).owner.equals(username))
+                            if (selectUser(conn,username).id == user.pageList.get(i).userId)
                             {
                                 user.pageList.get(i).canDelete = true;
                             }
@@ -113,7 +132,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     user.currentPage++;
                     if (user.currentPage == 1)
@@ -144,7 +163,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
 
                     user.currentPage--;
@@ -177,7 +196,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     int chosenPage=user.currentPage;
                     String pageStr = request.queryParams("pageselected");
@@ -224,12 +243,6 @@ public class Main
                     String password = request.queryParams("password");
                     User user;
 
-                    //start hashmap of users if one isnt loaded
-                    if(users == null)
-                    {
-                        users = new HashMap<String, String>();
-                    }
-
                     if (username.isEmpty() || password.isEmpty())
                     {
                         response.redirect("/");
@@ -237,18 +250,17 @@ public class Main
                     }
 
                     //validate user/create new user
-                    if (users.get(username) == null)
+                    if (selectUser(conn, username) == null)
                     {
-                        users.put(username,password);
-                        saveUsers(USER_FILE_LOCATION);
+                        insertUser(conn,username,password);
                         session.attribute("username", username);
-                        user = new User(username);
+                        user = selectUser(conn, username);
                         user.signedIn=true;
                     }
-                    else if (users.get(username).equals(password))
+                    else if (selectUser(conn,username).password.equals(password))
                     {
                         session.attribute("username", username);
-                        user = userMap.get(username);
+                        user = selectUser(conn, username);
                         user.signedIn = true;
                     }
                     else
@@ -267,7 +279,7 @@ public class Main
 
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
                     ArrayList<String> actors = new ArrayList();
                     String title = request.queryParams("title");
                     String director = request.queryParams("director");
@@ -308,10 +320,8 @@ public class Main
                         }
                         actors.add(cleanField);
                     }
-                    Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
-                    movieArchive.add(newMovie);
-                    Collections.sort(movieArchive);
-                    saveMovieArchive(MOVIE_FILE_LOCATION);
+                    Movie newMovie = new Movie(title, actors, director, runtime, year, rating, selectUser(conn, username).id);
+                    insertMovie(conn, newMovie);
                     user.showAddForm = false;
 
                     session.attribute("username", username);
@@ -325,7 +335,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     int identity;
                     int spotInList=-1;
@@ -342,9 +352,7 @@ public class Main
                     {
                         identity = user.editPageId;
                     }
-                    Movie movie = null;
-                    spotInList = findMovie(identity);
-                    movie = movieArchive.get(spotInList);
+                    Movie movie = selectMovie(conn, identity);
 
                     HashMap m = new HashMap();
                     if (movie !=null)
@@ -372,7 +380,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     ArrayList<String> actors = new ArrayList();
                     String title = request.queryParams("title");
@@ -382,9 +390,7 @@ public class Main
                     String runtimeStr = request.queryParams("runtime");
                     String yearStr = request.queryParams("year");
                     int identity = Integer.valueOf(request.queryParams("id"));
-                    int spotInList = -1;
-                    Movie movie = null;
-                    spotInList = findMovie(identity);
+                    Movie movie = selectMovie(conn, identity);
 
                     int runtime;
                     if (runtimeStr != null && runtimeStr.matches("[0-9]+"))
@@ -418,13 +424,9 @@ public class Main
                         }
                         actors.add(cleanField);
                     }
-                    Movie newMovie = new Movie(title, actors, director, runtime, year, rating, username);
-                    movieArchive.remove(spotInList);
+                    Movie newMovie = new Movie(title, actors, director, runtime, year, rating, selectUser(conn, username).id);
                     user.editPageId = newMovie.id;
                     user.showEditForm = false;
-                    movieArchive.add(newMovie);
-                    Collections.sort(movieArchive);
-                    saveMovieArchive(MOVIE_FILE_LOCATION);
 
                     session.attribute("username", username);
                     response.redirect("/");
@@ -438,7 +440,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     user.showAddForm = !user.showAddForm;
 
@@ -453,7 +455,7 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     user.showEditForm = !user.showEditForm;
 
@@ -479,14 +481,10 @@ public class Main
                 {
                     Session session = request.session();
                     String username = session.attribute("username");
-                    User user = userMap.get(username);
+                    User user = selectUser(conn, username);
 
                     int identity = Integer.valueOf(request.queryParams("id"));
-                    int spotInList = -1;
-                    spotInList = findMovie(identity);
-                    movieArchive.remove(spotInList);
-                    Collections.sort(movieArchive);
-                    saveMovieArchive(MOVIE_FILE_LOCATION);
+                    deleteMovie(conn, identity);
 
                     session.attribute("username", username);
                     response.redirect("/");
@@ -505,121 +503,151 @@ public class Main
     }
 
 
-    public static void loadMovieArchive(String fileLoc)
-    {
-        movieArchive = new ArrayList<>();
-        ArrayList<String> actors;
-        File f = new File(fileLoc);
-        Scanner fileScanner;
-        try {
-            fileScanner = new Scanner(f);
 
-            while (fileScanner.hasNext())
+
+    public static void insertMovie(Connection conn, Movie movie) throws SQLException
+    {
+        String actorsStr = "";
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO movie VALUES(NULL,?,?,?,?,?,?,?)");
+        stmt.setString(1,movie.title);
+        for (int i =0;i<movie.actors.size();i++)
+        {
+            if (i == movie.actors.size()-1)
             {
-                actors = new ArrayList<>();
-                String line = fileScanner.nextLine();
-                String[] fields = line.split("\\|");
-                for (int i = 6; i<fields.length; i++)
-                {
-                    actors.add(fields[i]);
-                }
-                Movie movie= new Movie(fields[4],actors,fields[3],Integer.valueOf(fields[2]),Integer.valueOf(fields[1]),Integer.valueOf(fields[0]), fields[5]);
-                movieArchive.add(movie);
+                actorsStr = String.format("%s%s",actorsStr, movie.actors.get(i));
             }
-            fileScanner.close();
-        } catch (FileNotFoundException e)
-        {
-
-        }
-    }
-
-    //saveOrder: rating, releaseYear, minutesRunTime, director, title, owner, actor, actor, actor....
-    //Constructor Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating, String owner)
-
-    public static void saveMovieArchive(String fileLoc)
-    {
-        try
-        {
-            PrintWriter output = new PrintWriter(fileLoc);
-            for (Movie m : movieArchive)
+            else
             {
-                output.printf("%d|%d|%d|%s|%s|%s|", m.rating, m.releaseYear, m.minutesRuntime, m.director,m.title,m.owner);
-                for(int i = 0; i<m.actors.size();i++)
-                {
-                    if (i==(m.actors.size()-1))
-                    {
-                        output.printf("%s\n", m.actors.get(i));
-                    }
-                    else
-                    {
-                        output.printf("%s|", m.actors.get(i));
-                    }
-                }
-            }
-            output.close();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void loadUsers(String fileLoc)
-    {
-        users = new HashMap<>();
-        ArrayList<String> actors;
-        File f = new File(fileLoc);
-        Scanner fileScanner = null;
-        try
-        {
-            fileScanner = new Scanner(f);
-
-            fileScanner.nextLine();
-            while (fileScanner.hasNext())
-            {
-                String line = fileScanner.nextLine();
-                String[] fields = line.split("\\|");
-                users.put(fields[0],fields[1]);
-                userMap.put(fields[0],new User(fields[0]));
+                actorsStr = String.format("%s%s|",actorsStr, movie.actors.get(i));
             }
         }
-        catch (FileNotFoundException e)
-        {
-
-        }
+        stmt.setString(2,actorsStr);
+        stmt.setString(3,movie.director);
+        stmt.setInt(4,movie.minutesRuntime);
+        stmt.setInt(5,movie.releaseYear);
+        stmt.setInt(6,movie.rating);
+        stmt.setInt(7,movie.userId);
+        stmt.execute();
     }
 
-    public static void saveUsers(String fileLoc)
+    public static Movie selectMovie(Connection conn, int id) throws SQLException
     {
-        try {
-            PrintWriter output = new PrintWriter(fileLoc);
-
-            Iterator iterator = users.keySet().iterator();
-            while(iterator.hasNext())
-            {
-                String key = (String) iterator.next();
-                output.printf("%s|%s\n", key, users.get(key));
-            }
-            output.close();
-        }
-        catch (Exception e)
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies INNER JOIN users ON movies.user_id = users.id WHERE id = ?");
+        stmt.setInt(1, id);
+        ResultSet results = stmt.executeQuery();
+        if (results.next())
         {
-
+            String title = results.getString("movies.title");
+            String actors = results.getString("movies.actors");//pipe separated values are changed to an arraylist in the constructor
+            String director = results.getString("movies.director");
+            int minutesRuntime = results.getInt("movies.minutes_runtime");
+            int year = results.getInt("movies.release_year");
+            int rating = results.getInt("movies.rating");
+            int userId = results.getInt("users.id");
+            return new Movie(id, title, actors, director, minutesRuntime, year, rating, userId);
         }
+        return null;
     }
 
-    public static int findMovie(int identity)
+    public static ArrayList<Movie> selectMovies(Connection conn) throws SQLException
     {
-        int location= -1;
-        for(int i=0;i<movieArchive.size();i++)
+        ArrayList<Movie> movies=null;
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies INNER JOIN users ON movies.user_id = users.id");
+        ResultSet results = stmt.executeQuery();
+        while (results.next())
         {
-            if(movieArchive.get(i).id == identity)
+            int id = results.getInt("id");
+            String title = results.getString("movies.title");
+            String actors = results.getString("movies.actors");//pipe separation values are taken care of in the constructor
+            String director = results.getString("movies.director");
+            int minutesRuntime = results.getInt("movies.minutes_runtime");
+            int year = results.getInt("movies.release_year");
+            int rating = results.getInt("movies.rating");
+            int userId = results.getInt("users.id");
+
+            Movie movie = new Movie(id, title, actors, director, minutesRuntime, year, rating, userId);
+            movies.add(movie);
+        }
+        return movies;
+    }
+
+    public static ArrayList<Movie> selectMoviesByUser(Connection conn, int user_id) throws SQLException
+    {
+        ArrayList<Movie> movies=null;
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM movies INNER JOIN users ON movies.user_id = users.id WHERE users.id = ?");
+        ResultSet results = stmt.executeQuery();
+        while (results.next())
+        {
+            int id = results.getInt("id");
+            String title = results.getString("movies.title");
+            String actors = results.getString("movies.actors");//pipe separation values are taken care of in the constructor
+            String director = results.getString("movies.director");
+            int minutesRuntime = results.getInt("movies.minutes_runtime");
+            int year = results.getInt("movies.release_year");
+            int rating = results.getInt("movies.rating");
+            int userId = results.getInt("users.id");
+
+            Movie movie = new Movie(id, title, actors, director, minutesRuntime, year, rating, userId);
+            movies.add(movie);
+        }
+        return movies;
+    }
+
+    public static void updateMovie(Connection conn, Movie movie) throws SQLException
+    {
+        String actorsStr = "";
+        PreparedStatement stmt = conn.prepareStatement("UPDATE movies SET title = ?, actors = ?,director = ?,minutes_runtime = ?, release_year = ?, rating = ? WHERE id = ?)");
+        stmt.setString(1,movie.title);
+        for (int i =0;i<movie.actors.size();i++)
+        {
+            if (i == movie.actors.size()-1)
             {
-                location = i;
-                i=movieArchive.size();
+                actorsStr = String.format("%s%s",actorsStr, movie.actors.get(i));
+            }
+            else
+            {
+                actorsStr = String.format("%s%s|",actorsStr, movie.actors.get(i));
             }
         }
-        return location;
+        stmt.setString(2,actorsStr);
+        stmt.setString(3,movie.director);
+        stmt.setInt(4,movie.minutesRuntime);
+        stmt.setInt(5,movie.releaseYear);
+        stmt.setInt(6,movie.rating);
+        stmt.setInt(7,movie.id);
+        stmt.execute();
     }
+
+    public static void deleteMovie(Connection conn, int id) throws SQLException
+    {
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM movies WHERE id = ?");
+        stmt.setInt(1,id);
+        stmt.execute();
+    }
+
+    public static void insertUser(Connection conn, String name, String password) throws SQLException
+    {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO users VALUES(NULL,?,?)");
+        stmt.setString(1,name);
+        stmt.setString(2,password);
+        stmt.execute();
+    }
+
+    public static User selectUser(Connection conn, String name) throws SQLException
+    {
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE name = ?");
+        stmt.setString(1, name);
+        ResultSet results = stmt.executeQuery();
+        if (results.next())
+        {
+            int id = results.getInt("id");
+            name = results.getString("name");
+            String password = results.getString("password");
+            return new User(id,name,password);
+        }
+        return null;
+    }
+
+
 
 }

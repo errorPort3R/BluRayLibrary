@@ -11,28 +11,43 @@ import java.util.ArrayList;
 //Constructor order: Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating)
 public class Movie implements Comparable
 {
+    int id;
     String title;
     ArrayList<String> actors;
     String director;
     int minutesRuntime;
     int releaseYear;
     int rating;
-    String owner;
-    int id;
-    static int sessionUniqueId = 10110;
+    int userId;
     boolean canDelete;
 
-    public Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating, String owner) {
+
+    public Movie(int id, String title, String actors, String director, int minutesRuntime, int releaseYear, int rating, int userId) {
+        this.id = id;
+        this.title = title;
+        this.actors = new ArrayList<>();
+        String[] fields = actors.split("\\|");
+        for (String actor : fields)
+        {
+            this.actors.add(actor);
+        }
+        this.director = director;
+        this.minutesRuntime = minutesRuntime;
+        this.releaseYear = releaseYear;
+        this.rating = rating;
+        this.userId = userId;
+
+    }
+
+    public Movie(String title, ArrayList<String> actors, String director, int minutesRuntime, int releaseYear, int rating, int userId)
+    {
         this.title = title;
         this.actors = actors;
         this.director = director;
         this.minutesRuntime = minutesRuntime;
         this.releaseYear = releaseYear;
         this.rating = rating;
-        this.owner = owner;
-        id = sessionUniqueId;
-        sessionUniqueId++;
-
+        this.userId = userId;
     }
 
     @Override
